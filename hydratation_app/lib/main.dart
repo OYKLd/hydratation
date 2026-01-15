@@ -26,13 +26,13 @@ class HydrationApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.light(
-          primary: const Color(0xFF4FC3F7), // Bleu clair
-          secondary: const Color(0xFF80D8FF), // Bleu très clair
+          primary: const Color(0xFF4FC3F7), 
+          secondary: const Color(0xFF80D8FF), 
           surface: Colors.white,
-          background: const Color(0xFFF5F9FF), // Bleu très très clair
+          background: const Color(0xFFF5F9FF), 
           onPrimary: Colors.white,
           onSecondary: Colors.white,
-          onBackground: const Color(0xFF424242), // Gris foncé
+          onBackground: const Color(0xFF424242), 
           brightness: Brightness.light,
         ),
         fontFamily: 'Roboto',
