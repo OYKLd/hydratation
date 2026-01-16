@@ -85,7 +85,7 @@ class _HydrationHomePageState extends State<HydrationHomePage> {
     await _notificationsPlugin.initialize(
       initSettings,
       onDidReceiveNotificationResponse: (details) {
-        // Gérer le clic sur la notification si nécessaire
+        // Gérer le clic sur la notification 
       },
     );
   }
