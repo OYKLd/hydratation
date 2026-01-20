@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/timezone.dart' as tz;
@@ -44,11 +45,34 @@ class _HydrationHomePageState extends State<HydrationHomePage> {
   TimeOfDay _startTime = const TimeOfDay(hour: 8, minute: 0);
   TimeOfDay _endTime = const TimeOfDay(hour: 22, minute: 0);
 
+  // ---------------- CONSEILS ----------------
+  final List<String> _tips = [
+    "Boire un verre d’eau au réveil aide à réhydrater le corps.",
+    "Boire régulièrement évite les maux de tête.",
+    "L’eau améliore la concentration.",
+    "Boire avant d’avoir soif est une bonne habitude.",
+    "Une bonne hydratation améliore la peau.",
+    "Boire après le sport aide la récupération.",
+    "Garde toujours une bouteille près de toi.",
+    "L’eau aide à éliminer les toxines.",
+  ];
+
+  String _dailyTip = "";
+
+  // -----------------------------------------
+
   @override
   void initState() {
     super.initState();
     _initNotifications();
     _loadSettings();
+    _generateDailyTip();
+  }
+
+  void _generateDailyTip() {
+    final today = DateTime.now().day;
+    final index = today % _tips.length;
+    _dailyTip = _tips[index];
   }
 
   Future<void> _initNotifications() async {
@@ -56,10 +80,7 @@ class _HydrationHomePageState extends State<HydrationHomePage> {
     const ios = DarwinInitializationSettings();
 
     await _notificationsPlugin.initialize(
-      const InitializationSettings(
-        android: android,
-        iOS: ios,
-      ),
+      const InitializationSettings(android: android, iOS: ios),
     );
   }
 
@@ -87,6 +108,7 @@ class _HydrationHomePageState extends State<HydrationHomePage> {
     await _cancelAllNotifications();
 
     final now = DateTime.now();
+
     DateTime current = DateTime(
       now.year,
       now.month,
@@ -151,7 +173,7 @@ class _HydrationHomePageState extends State<HydrationHomePage> {
         isStart ? _startTime = picked : _endTime = picked;
       });
 
-      if (_isActive) await _scheduleNotifications();
+      if (_isActive) _scheduleNotifications();
     }
   }
 
@@ -164,7 +186,6 @@ class _HydrationHomePageState extends State<HydrationHomePage> {
           child: Column(
             children: [
               const SizedBox(height: 20),
-
               const Text(
                 "Hydratation Douce",
                 style: TextStyle(
@@ -172,93 +193,87 @@ class _HydrationHomePageState extends State<HydrationHomePage> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-
               const SizedBox(height: 10),
-
               const Text(
-                "Prenez soin de vous en restant hydraté toute la journée",
+                "Prenez soin de vous en restant hydratée toute la journée",
                 textAlign: TextAlign.center,
               ),
-
               const SizedBox(height: 30),
 
+              // ---------------- CARD PRINCIPALE ----------------
               Card(
+                elevation: 4,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
-                elevation: 4,
                 child: Padding(
                   padding: const EdgeInsets.all(20),
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        const Icon(
-                          Icons.water_drop_outlined,
-                          size: 60,
-                          color: Color(0xFF4FC3F7),
-                        ),
-
-                        const SizedBox(height: 20),
-
-                        SwitchListTile(
-                          title: const Text("Activer les rappels"),
-                          value: _isActive,
-                          onChanged: (_) => _toggleReminders(),
-                        ),
-
-                        const Divider(),
-
-                        ListTile(
-                          title: const Text("Heure de début"),
-                          subtitle: Text(_startTime.format(context)),
-                          trailing: const Icon(Icons.access_time),
-                          onTap: () => _selectTime(true),
-                        ),
-
-                        ListTile(
-                          title: const Text("Heure de fin"),
-                          subtitle: Text(_endTime.format(context)),
-                          trailing: const Icon(Icons.access_time),
-                          onTap: () => _selectTime(false),
-                        ),
-
-                        const SizedBox(height: 10),
-                        const Text("Intervalle entre les rappels"),
-
-                        Slider(
-                          value: _interval.toDouble(),
-                          min: 15,
-                          max: 120,
-                          divisions: 7,
-                          label: "$_interval min",
-                          onChanged: (v) {
-                            setState(() => _interval = v.round());
-                            _saveSettings();
-                            if (_isActive) _scheduleNotifications();
-                          },
-                        ),
-
-                        Text("Toutes les $_interval minutes"),
-                      ],
-                    ),
+                  child: Column(
+                    children: [
+                      const Icon(
+                        Icons.water_drop_outlined,
+                        size: 60,
+                        color: Color(0xFF4FC3F7),
+                      ),
+                      const SizedBox(height: 20),
+                      SwitchListTile(
+                        title: const Text("Activer les rappels"),
+                        value: _isActive,
+                        onChanged: (_) => _toggleReminders(),
+                      ),
+                      const Divider(),
+                      ListTile(
+                        title: const Text("Heure de début"),
+                        subtitle: Text(_startTime.format(context)),
+                        trailing: const Icon(Icons.access_time),
+                        onTap: () => _selectTime(true),
+                      ),
+                      ListTile(
+                        title: const Text("Heure de fin"),
+                        subtitle: Text(_endTime.format(context)),
+                        trailing: const Icon(Icons.access_time),
+                        onTap: () => _selectTime(false),
+                      ),
+                      const SizedBox(height: 10),
+                      const Text("Intervalle entre les rappels"),
+                      Slider(
+                        value: _interval.toDouble(),
+                        min: 15,
+                        max: 120,
+                        divisions: 7,
+                        label: "$_interval min",
+                        onChanged: (v) {
+                          setState(() => _interval = v.round());
+                          _saveSettings();
+                          if (_isActive) _scheduleNotifications();
+                        },
+                      ),
+                      Text("Toutes les $_interval minutes"),
+                    ],
                   ),
                 ),
               ),
 
-              const SizedBox(height: 20),
+              const SizedBox(height: 25),
 
-              const Text(
-                "Conseil du jour",
-                style: TextStyle(fontWeight: FontWeight.bold),
+              // ---------------- CONSEIL DU JOUR ----------------
+              const Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  "Conseil du jour",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
+                ),
               ),
-
               const SizedBox(height: 10),
-
-              const Card(
+              Card(
                 child: Padding(
-                  padding: EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(16),
                   child: Text(
-                    "Boire un verre d’eau au réveil aide à bien démarrer la journée.",
+                    _dailyTip,
+                    style: const TextStyle(fontSize: 15),
                   ),
                 ),
               ),
